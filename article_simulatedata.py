@@ -145,22 +145,28 @@ def simulate_data_(thetas, sigma_theta, sigmas, weights, nu=100, ratio_act=None,
 
 if __name__ == "__main__":
 
-    import matplotlib.pyplot as plt
-    n_persons = 20
+    # import matplotlib.pyplot as plt
+    n_persons = 20000
     seed = 123456
     n_cells = 10**4
     Y, act_Class, mus, thetas, sigmas, weights, x = simulate_data_v2(n_cells=n_cells, n_persons=n_persons, seed=seed)
     K = len(thetas[:, 0])
-    color = plt.cm.rainbow(np.linspace(0, 1, K))
-    for k in range(4):
-        plt.figure()
-        for j in range(mus.shape[1]):
-            plt.text(thetas[j, 2*k], thetas[j, 2*k + 1], str(j), color=color[j],  fontsize=14)
-        for i in range(n_persons):
-            for j in range(mus.shape[1]):
-                plt.scatter(mus[2*k, j, i], mus[2*k + 1, j, i], color=color[j], s=4)
+    # color = plt.cm.rainbow(np.linspace(0, 1, K))
+    # for k in range(4):
+    #     plt.figure()
+    #     for j in range(mus.shape[1]):
+    #         plt.text(thetas[j, 2*k], thetas[j, 2*k + 1], str(j), color=color[j],  fontsize=14)
+    #     for i in range(n_persons):
+    #         for j in range(mus.shape[1]):
+    #             plt.scatter(mus[2*k, j, i], mus[2*k + 1, j, i], color=color[j], s=4)
     # plt.show()
+    data = np.zeros((n_persons, 9))
     for i in range(n_persons):
         weights = np.load('weights_.npy')
         weights /= np.sum(weights)
-        print(random.choices([0,1,2,3,4,5,6,7,8,9,10], weights=weights, k=1))
+        which_cluster = random.choices([0,1,2,3,4,5,6,7,8,9,10], weights=weights, k=1)[0]
+        data[i] = np.concatenate((np.array([which_cluster]), mus[:, which_cluster, i]))
+    df = pd.DataFrame(data=data, columns=["cluster", "0", "1", "2", "3", "4", "5", "6", "7"])
+    df.to_csv('large_synthetic_data.csv', index=False)
+
+
